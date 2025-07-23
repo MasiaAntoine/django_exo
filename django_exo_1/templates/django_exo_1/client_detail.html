@@ -1,0 +1,279 @@
+{% extends 'django_exo_1/base.html' %}
+{% block title %}{{ client.nom }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-start mb-4">
+      <div>
+        <h1 class="mb-2">
+          {% if client.type_client == 'entreprise' %}
+            <i class="fas fa-building me-2 text-primary"></i>
+          {% elif client.type_client == 'association' %}
+            <i class="fas fa-users me-2 text-success"></i>
+          {% elif client.type_client == 'administration' %}
+            <i class="fas fa-university me-2 text-info"></i>
+          {% else %}
+            <i class="fas fa-user me-2 text-secondary"></i>
+          {% endif %}
+          {{ client.nom }}
+        </h1>
+        <span class="badge 
+          {% if client.type_client == 'entreprise' %}bg-primary
+          {% elif client.type_client == 'association' %}bg-success
+          {% elif client.type_client == 'administration' %}bg-info
+          {% else %}bg-secondary{% endif %} me-2">
+          {{ client.get_type_client_display }}
+        </span>
+        {% if client.est_actif %}
+          <span class="badge bg-success">Actif</span>
+        {% else %}
+          <span class="badge bg-danger">Inactif</span>
+        {% endif %}
+      </div>
+      <div class="btn-group" role="group">
+        <a href="{% url 'django_exo_1:client_list' %}" class="btn btn-outline-secondary">
+          <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+        </a>
+        <a href="{% url 'django_exo_1:client_update' client.pk %}" class="btn btn-primary">
+          <i class="fas fa-edit me-1"></i>Modifier
+        </a>
+        <a href="{% url 'django_exo_1:client_delete' client.pk %}" class="btn btn-outline-danger">
+          <i class="fas fa-trash me-1"></i>Supprimer
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Statistiques du client -->
+  <div class="col-12 mb-4">
+    <div class="row">
+      <div class="col-md-3 mb-3">
+        <div class="card text-white bg-primary">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="card-title">{{ stats.total_factures|default:0 }}</h4>
+                <p class="card-text">Total Factures</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-file-invoice fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card text-white bg-success">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="card-title">{{ stats.factures_payees|default:0 }}</h4>
+                <p class="card-text">Factures Payées</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-check-circle fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card text-white bg-warning">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="card-title">{{ stats.factures_en_attente|default:0 }}</h4>
+                <p class="card-text">En Attente</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-clock fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="col-md-3 mb-3">
+        <div class="card text-white bg-info">
+          <div class="card-body">
+            <div class="d-flex justify-content-between">
+              <div>
+                <h4 class="card-title">{{ stats.ca_total|default:0|floatformat:2 }}€</h4>
+                <p class="card-text">CA Réalisé</p>
+              </div>
+              <div class="align-self-center">
+                <i class="fas fa-euro-sign fa-2x"></i>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <!-- Informations du client -->
+  <div class="col-md-6">
+    <div class="card mb-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-address-card me-2"></i>
+          Informations du client
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-12 mb-3">
+            <strong>Nom/Raison sociale :</strong><br>
+            {{ client.nom }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Email :</strong><br>
+            <a href="mailto:{{ client.email }}">{{ client.email }}</a>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Téléphone :</strong><br>
+            {% if client.telephone %}
+              <a href="tel:{{ client.telephone }}">{{ client.telephone }}</a>
+            {% else %}
+              <span class="text-muted">Non renseigné</span>
+            {% endif %}
+          </div>
+          <div class="col-12 mb-3">
+            <strong>Adresse :</strong><br>
+            {{ client.adresse|linebreaks }}
+            {{ client.code_postal }} {{ client.ville }}<br>
+            {{ client.pays }}
+          </div>
+          {% if client.siret %}
+            <div class="col-md-6 mb-3">
+              <strong>N° SIRET :</strong><br>
+              {{ client.siret }}
+            </div>
+          {% endif %}
+          {% if client.numero_tva %}
+            <div class="col-md-6 mb-3">
+              <strong>N° TVA :</strong><br>
+              {{ client.numero_tva }}
+            </div>
+          {% endif %}
+        </div>
+      </div>
+    </div>
+
+    {% if client.notes %}
+      <div class="card">
+        <div class="card-header">
+          <h5 class="card-title mb-0">
+            <i class="fas fa-sticky-note me-2"></i>
+            Notes
+          </h5>
+        </div>
+        <div class="card-body">
+          {{ client.notes|linebreaks }}
+        </div>
+      </div>
+    {% endif %}
+  </div>
+
+  <!-- Factures du client -->
+  <div class="col-md-6">
+    <div class="card">
+      <div class="card-header d-flex justify-content-between align-items-center">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-file-invoice me-2"></i>
+          Factures ({{ factures.count }})
+        </h5>
+        <a href="{% url 'django_exo_1:facture_create' %}?client={{ client.pk }}" class="btn btn-sm btn-primary">
+          <i class="fas fa-plus me-1"></i>Nouvelle facture
+        </a>
+      </div>
+      <div class="card-body">
+        {% if factures %}
+          <div class="table-responsive">
+            <table class="table table-sm">
+              <thead class="table-light">
+                <tr>
+                  <th>Numéro</th>
+                  <th>Date</th>
+                  <th>Montant</th>
+                  <th>Statut</th>
+                  <th></th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for facture in factures %}
+                  <tr>
+                    <td>
+                      <strong>{{ facture.numero }}</strong>
+                    </td>
+                    <td>{{ facture.date_emission|date:"d/m/Y" }}</td>
+                    <td>{{ facture.montant_ttc|floatformat:2 }}€</td>
+                    <td>
+                      <span class="badge statut-{{ facture.statut }}">
+                        {{ facture.get_statut_display }}
+                      </span>
+                    </td>
+                    <td class="text-end">
+                      <a href="{% url 'django_exo_1:facture_detail' facture.pk %}" 
+                         class="btn btn-sm btn-outline-primary" 
+                         title="Voir la facture">
+                        <i class="fas fa-eye"></i>
+                      </a>
+                    </td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          
+          {% if factures.count > 10 %}
+            <div class="text-center mt-3">
+              <a href="{% url 'django_exo_1:facture_list' %}?client={{ client.pk }}" class="btn btn-outline-primary btn-sm">
+                Voir toutes les factures de ce client
+              </a>
+            </div>
+          {% endif %}
+        {% else %}
+          <div class="text-center py-3">
+            <i class="fas fa-file-invoice fa-2x text-muted mb-2"></i>
+            <p class="text-muted">Aucune facture pour ce client</p>
+            <a href="{% url 'django_exo_1:facture_create' %}?client={{ client.pk }}" class="btn btn-primary btn-sm">
+              <i class="fas fa-plus me-1"></i>Créer la première facture
+            </a>
+          </div>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Métadonnées -->
+<div class="row mt-4">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h6 class="card-title mb-0">
+          <i class="fas fa-info-circle me-2"></i>
+          Informations système
+        </h6>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6">
+            <strong>Date de création :</strong><br>
+            <small class="text-muted">{{ client.date_creation|date:"d/m/Y à H:i" }}</small>
+          </div>
+          <div class="col-md-6">
+            <strong>Dernière modification :</strong><br>
+            <small class="text-muted">{{ client.date_modification|date:"d/m/Y à H:i" }}</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

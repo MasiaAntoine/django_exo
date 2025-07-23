@@ -1,0 +1,18 @@
+{
+  "overrides": [
+    {
+      "files": ["*.html"],
+      "options": {
+        "parser": "html",
+        "htmlWhitespaceSensitivity": "ignore"
+      }
+    },
+    {
+      "files": ["**/*.py"],
+      "options": {
+        "parser": "python"
+      }
+    }
+  ],
+  "ignorePath": ".prettierignore"
+}

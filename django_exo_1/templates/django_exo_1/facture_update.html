@@ -1,0 +1,313 @@
+{% extends 'django_exo_1/base.html' %} {% block title %}Modifier Facture {{
+facture.numero }} - {{ block.super }}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>
+        <i class="fas fa-edit me-2 text-primary"></i>
+        Modifier Facture {{ facture.numero }}
+      </h1>
+      <div>
+        <a
+          href="{% url 'django_exo_1:facture_detail' facture.pk %}"
+          class="btn btn-outline-info"
+        >
+          <i class="fas fa-eye me-1"></i>Voir détail
+        </a>
+        <a
+          href="{% url 'django_exo_1:facture_list' %}"
+          class="btn btn-outline-secondary"
+        >
+          <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8 mx-auto">
+    <div class="card">
+      <div class="card-header bg-warning text-dark">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-edit me-2"></i>
+          Modification de la facture
+        </h5>
+      </div>
+      <div class="card-body">
+        <form method="post" novalidate>
+          {% csrf_token %}
+
+          <!-- Informations principales -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted border-bottom pb-2 mb-3">
+                <i class="fas fa-info-circle me-1"></i>
+                Informations principales
+              </h6>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.numero.id_for_label }}" class="form-label">
+                <strong>{{ form.numero.label }}</strong>
+                <span class="text-danger">*</span>
+              </label>
+              {{ form.numero }} {% if form.numero.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.numero.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-3 mb-3">
+              <label
+                for="{{ form.date_emission.id_for_label }}"
+                class="form-label"
+              >
+                <strong>{{ form.date_emission.label }}</strong>
+                <span class="text-danger">*</span>
+              </label>
+              {{ form.date_emission }} {% if form.date_emission.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.date_emission.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-3 mb-3">
+              <label
+                for="{{ form.date_echeance.id_for_label }}"
+                class="form-label"
+              >
+                <strong>{{ form.date_echeance.label }}</strong>
+                <span class="text-danger">*</span>
+              </label>
+              {{ form.date_echeance }} {% if form.date_echeance.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.date_echeance.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Informations client -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted border-bottom pb-2 mb-3">
+                <i class="fas fa-user me-1"></i>
+                Informations client
+              </h6>
+            </div>
+
+            <div class="col-12 mb-3">
+              <label
+                for="{{ form.client.id_for_label }}"
+                class="form-label"
+              >
+                <strong>{{ form.client.label }}</strong>
+                <span class="text-danger">*</span>
+              </label>
+              <div class="d-flex gap-2">
+                {{ form.client }}
+                <a
+                  href="{% url 'django_exo_1:client_detail' facture.client.pk %}"
+                  class="btn btn-outline-info"
+                  title="Voir le détail du client"
+                >
+                  <i class="fas fa-eye"></i>
+                </a>
+                <a
+                  href="{% url 'django_exo_1:client_create' %}"
+                  class="btn btn-outline-success"
+                  target="_blank"
+                  title="Créer un nouveau client"
+                >
+                  <i class="fas fa-plus"></i>
+                </a>
+              </div>
+              {% if form.client.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.client.errors.0 }}
+              </div>
+              {% endif %}
+              <div class="form-text">
+                Client actuel: <strong>{{ facture.client.nom }}</strong> ({{ facture.client.email }})
+              </div>
+            </div>
+          </div>
+
+          <!-- Montants -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted border-bottom pb-2 mb-3">
+                <i class="fas fa-euro-sign me-1"></i>
+                Montants
+              </h6>
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label
+                for="{{ form.montant_ht.id_for_label }}"
+                class="form-label"
+              >
+                <strong>{{ form.montant_ht.label }}</strong>
+                <span class="text-danger">*</span>
+              </label>
+              <div class="input-group">
+                {{ form.montant_ht }}
+                <span class="input-group-text">€</span>
+              </div>
+              {% if form.montant_ht.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.montant_ht.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label for="{{ form.taux_tva.id_for_label }}" class="form-label">
+                <strong>{{ form.taux_tva.label }}</strong>
+              </label>
+              <div class="input-group">
+                {{ form.taux_tva }}
+                <span class="input-group-text">%</span>
+              </div>
+              {% if form.taux_tva.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.taux_tva.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-md-4 mb-3">
+              <label class="form-label">Montant TTC calculé</label>
+              <div class="form-control-plaintext bg-light rounded p-2">
+                <strong id="montant-ttc"
+                  >{{ facture.montant_ttc|floatformat:2 }}€</strong
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Catégorie et statut -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted border-bottom pb-2 mb-3">
+                <i class="fas fa-cog me-1"></i>
+                Catégorie et statut
+              </h6>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.categorie.id_for_label }}" class="form-label">
+                <strong>{{ form.categorie.label }}</strong>
+                <span class="text-muted">(optionnel)</span>
+              </label>
+              {{ form.categorie }} {% if form.categorie.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.categorie.errors.0 }}
+              </div>
+              {% endif %}
+              <div class="form-text">
+                Si aucune catégorie n'est sélectionnée, la facture sera automatiquement assignée à la catégorie "Autres".
+              </div>
+            </div>
+
+            <div class="col-md-6 mb-3">
+              <label for="{{ form.statut.id_for_label }}" class="form-label">
+                <strong>{{ form.statut.label }}</strong>
+              </label>
+              {{ form.statut }} {% if form.statut.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.statut.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Description -->
+          <div class="row mb-4">
+            <div class="col-12">
+              <h6 class="text-muted border-bottom pb-2 mb-3">
+                <i class="fas fa-file-text me-1"></i>
+                Description
+              </h6>
+            </div>
+
+            <div class="col-12 mb-3">
+              <label
+                for="{{ form.description.id_for_label }}"
+                class="form-label"
+              >
+                <strong>{{ form.description.label }}</strong>
+                <span class="text-danger">*</span>
+              </label>
+              {{ form.description }} {% if form.description.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.description.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+
+            <div class="col-12 mb-3">
+              <label for="{{ form.notes.id_for_label }}" class="form-label">
+                <strong>{{ form.notes.label }}</strong>
+              </label>
+              {{ form.notes }} {% if form.notes.errors %}
+              <div class="invalid-feedback d-block">
+                {{ form.notes.errors.0 }}
+              </div>
+              {% endif %}
+            </div>
+          </div>
+
+          <!-- Boutons -->
+          <div class="row">
+            <div class="col-12">
+              <div class="d-flex justify-content-between">
+                <a
+                  href="{% url 'django_exo_1:facture_detail' facture.pk %}"
+                  class="btn btn-outline-secondary"
+                >
+                  <i class="fas fa-times me-1"></i>Annuler
+                </a>
+                <button type="submit" class="btn btn-warning">
+                  <i class="fas fa-save me-1"></i>Sauvegarder les modifications
+                </button>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %} {% block extra_js %}
+<script>
+  // Calcul automatique du montant TTC
+  document
+    .getElementById("{{ form.montant_ht.id_for_label }}")
+    .addEventListener("input", calculerTTC);
+  document
+    .getElementById("{{ form.taux_tva.id_for_label }}")
+    .addEventListener("input", calculerTTC);
+
+  function calculerTTC() {
+    const montantHT =
+      parseFloat(
+        document.getElementById("{{ form.montant_ht.id_for_label }}").value
+      ) || 0;
+    const tauxTVA =
+      parseFloat(
+        document.getElementById("{{ form.taux_tva.id_for_label }}").value
+      ) || 0;
+    const montantTTC = montantHT * (1 + tauxTVA / 100);
+
+    document.getElementById("montant-ttc").textContent =
+      montantTTC.toFixed(2) + "€";
+  }
+
+  // Calculer au chargement de la page
+  calculerTTC();
+</script>
+{% endblock %}

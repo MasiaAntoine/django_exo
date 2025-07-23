@@ -1,0 +1,22 @@
+# Ignorer tous les templates Django
+*.html
+**/*.html
+
+# Ignorer les fichiers Python
+*.py
+**/*.py
+
+# Ignorer les fichiers statiques Django
+static/
+*/static/
+**/static/
+
+# Ignorer les templates
+templates/
+*/templates/
+**/templates/
+
+# Ignorer les migrations
+migrations/
+*/migrations/
+**/migrations/

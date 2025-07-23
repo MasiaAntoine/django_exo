@@ -1,0 +1,314 @@
+{% extends 'django_exo_1/base.html' %}
+
+{% block title %}Liste des Factures - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>
+                <i class="fas fa-file-invoice me-2 text-primary"></i>
+                Liste des Factures
+            </h1>
+            <a href="{% url 'django_exo_1:facture_create' %}" class="btn btn-primary">
+                <i class="fas fa-plus me-1"></i>Nouvelle Facture
+            </a>
+        </div>
+    </div>
+</div>
+
+<!-- Filtres -->
+<div class="row mb-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-md-2">
+                        <label for="search" class="form-label">Recherche</label>
+                        <input type="text" class="form-control" id="search" name="search" 
+                               value="{{ request.GET.search }}" placeholder="Numéro ou nom client">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="client" class="form-label">Client</label>
+                        <select class="form-control" id="client" name="client">
+                            <option value="">Tous les clients</option>
+                            {% for client in clients %}
+                                <option value="{{ client.id }}" {% if request.GET.client == client.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ client.nom }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="statut" class="form-label">Statut</label>
+                        <select class="form-control" id="statut" name="statut">
+                            <option value="">Tous les statuts</option>
+                            {% for key, value in statuts %}
+                                <option value="{{ key }}" {% if request.GET.statut == key %}selected{% endif %}>
+                                    {{ value }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="categorie" class="form-label">Catégorie</label>
+                        <select class="form-control" id="categorie" name="categorie">
+                            <option value="">Toutes les catégories</option>
+                            {% for cat in categories %}
+                                <option value="{{ cat.id }}" {% if request.GET.categorie == cat.id|stringformat:"s" %}selected{% endif %}>
+                                    {{ cat.nom }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-outline-primary">
+                                <i class="fas fa-search me-1"></i>Filtrer
+                            </button>
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label">&nbsp;</label>
+                        <div class="d-grid">
+                            <a href="{% url 'django_exo_1:facture_list' %}" class="btn btn-outline-secondary">
+                                <i class="fas fa-times me-1"></i>Effacer
+                            </a>
+                        </div>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Liste des factures -->
+<div class="row">
+    <div class="col-12">
+        {% if factures %}
+            <!-- Barre d'actions pour les sélections multiples -->
+            <div class="card mb-3" id="bulk-actions" style="display: none;">
+                <div class="card-body py-2">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <span id="selected-count" class="text-muted">0 facture(s) sélectionnée(s)</span>
+                        <div class="btn-group btn-group-sm">
+                            <button type="button" class="btn btn-success" onclick="markAsPaid()">
+                                <i class="fas fa-check me-1"></i>Marquer comme payées
+                            </button>
+                            <button type="button" class="btn btn-outline-secondary" onclick="clearSelection()">
+                                <i class="fas fa-times me-1"></i>Annuler la sélection
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-body p-0">
+                    <form id="bulk-form" method="post" action="{% url 'django_exo_1:facture_bulk_action' %}">
+                        {% csrf_token %}
+                        <input type="hidden" name="action" value="mark_paid">
+                        <div class="table-responsive">
+                            <table class="table table-hover mb-0">
+                                <thead class="bg-light">
+                                    <tr>
+                                        <th width="50">
+                                            <div class="form-check">
+                                                <input class="form-check-input" type="checkbox" id="select-all">
+                                                <label class="form-check-label" for="select-all"></label>
+                                            </div>
+                                        </th>
+                                        <th>Numéro</th>
+                                        <th>Client</th>
+                                        <th>Date émission</th>
+                                        <th>Date échéance</th>
+                                        <th>Montant TTC</th>
+                                    <th>Catégorie</th>
+                                    <th>Statut</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for facture in factures %}
+                                    <tr>
+                                        <td>
+                                            <div class="form-check">
+                                                <input class="form-check-input facture-checkbox" 
+                                                       type="checkbox" 
+                                                       name="selected_factures" 
+                                                       value="{{ facture.pk }}"
+                                                       id="facture-{{ facture.pk }}"
+                                                       {% if facture.statut == 'payee' %}disabled{% endif %}>
+                                                <label class="form-check-label" for="facture-{{ facture.pk }}"></label>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <strong>{{ facture.numero }}</strong>
+                                        </td>
+                                        <td>
+                                            {{ facture.client.nom }}
+                                            <br>
+                                            <small class="text-muted">{{ facture.client.email }}</small>
+                                        </td>
+                                        <td>{{ facture.date_emission|date:"d/m/Y" }}</td>
+                                        <td>{{ facture.date_echeance|date:"d/m/Y" }}</td>
+                                        <td>
+                                            <strong>{{ facture.montant_ttc|floatformat:2 }}€</strong>
+                                        </td>
+                                        <td>
+                                            <span class="badge" style="background-color: {{ facture.categorie.couleur }}">
+                                                {{ facture.categorie.nom }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            <span class="badge statut-{{ facture.statut }}">
+                                                {{ facture.get_statut_display }}
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group btn-group-sm" role="group">
+                                                <a href="{% url 'django_exo_1:facture_detail' facture.pk %}" 
+                                                   class="btn btn-outline-info" title="Voir">
+                                                    <i class="fas fa-eye"></i>
+                                                </a>
+                                                <a href="{% url 'django_exo_1:facture_update' facture.pk %}" 
+                                                   class="btn btn-outline-primary" title="Modifier">
+                                                    <i class="fas fa-edit"></i>
+                                                </a>
+                                                <a href="{% url 'django_exo_1:facture_delete' facture.pk %}" 
+                                                   class="btn btn-outline-danger" title="Supprimer">
+                                                    <i class="fas fa-trash"></i>
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+            <!-- Pagination -->
+            {% if is_paginated %}
+                <nav aria-label="Pagination des factures" class="mt-4">
+                    <ul class="pagination justify-content-center">
+                        {% if page_obj.has_previous %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page=1{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.client %}&client={{ request.GET.client }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}{% if request.GET.categorie %}&categorie={{ request.GET.categorie }}{% endif %}">
+                                    <i class="fas fa-angle-double-left"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.previous_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.client %}&client={{ request.GET.client }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}{% if request.GET.categorie %}&categorie={{ request.GET.categorie }}{% endif %}">
+                                    <i class="fas fa-angle-left"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+
+                        <li class="page-item active">
+                            <span class="page-link">
+                                Page {{ page_obj.number }} sur {{ page_obj.paginator.num_pages }}
+                            </span>
+                        </li>
+
+                        {% if page_obj.has_next %}
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.next_page_number }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.client %}&client={{ request.GET.client }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}{% if request.GET.categorie %}&categorie={{ request.GET.categorie }}{% endif %}">
+                                    <i class="fas fa-angle-right"></i>
+                                </a>
+                            </li>
+                            <li class="page-item">
+                                <a class="page-link" href="?page={{ page_obj.paginator.num_pages }}{% if request.GET.search %}&search={{ request.GET.search }}{% endif %}{% if request.GET.client %}&client={{ request.GET.client }}{% endif %}{% if request.GET.statut %}&statut={{ request.GET.statut }}{% endif %}{% if request.GET.categorie %}&categorie={{ request.GET.categorie }}{% endif %}">
+                                    <i class="fas fa-angle-double-right"></i>
+                                </a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </nav>
+            {% endif %}
+        {% else %}
+            <div class="text-center py-5">
+                <i class="fas fa-file-invoice fa-4x text-muted mb-3"></i>
+                <h4 class="text-muted">Aucune facture trouvée</h4>
+                <p class="text-muted">Commencez par créer votre première facture.</p>
+                <a href="{% url 'django_exo_1:facture_create' %}" class="btn btn-primary">
+                    <i class="fas fa-plus me-1"></i>Créer une facture
+                </a>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const selectAllCheckbox = document.getElementById('select-all');
+    const factureCheckboxes = document.querySelectorAll('.facture-checkbox');
+    const bulkActions = document.getElementById('bulk-actions');
+    const selectedCountSpan = document.getElementById('selected-count');
+    const bulkForm = document.getElementById('bulk-form');
+
+    // Fonction pour mettre à jour le compteur et l'affichage
+    function updateBulkActions() {
+        const checkedBoxes = document.querySelectorAll('.facture-checkbox:checked:not(:disabled)');
+        const count = checkedBoxes.length;
+        
+        if (count > 0) {
+            bulkActions.style.display = 'block';
+            selectedCountSpan.textContent = `${count} facture(s) sélectionnée(s)`;
+        } else {
+            bulkActions.style.display = 'none';
+        }
+        
+        // Mettre à jour l'état de "Tout sélectionner"
+        const enabledCheckboxes = document.querySelectorAll('.facture-checkbox:not(:disabled)');
+        if (enabledCheckboxes.length > 0) {
+            selectAllCheckbox.indeterminate = count > 0 && count < enabledCheckboxes.length;
+            selectAllCheckbox.checked = count === enabledCheckboxes.length;
+        }
+    }
+
+    // Gestion de "Tout sélectionner"
+    selectAllCheckbox.addEventListener('change', function() {
+        const enabledCheckboxes = document.querySelectorAll('.facture-checkbox:not(:disabled)');
+        enabledCheckboxes.forEach(checkbox => {
+            checkbox.checked = this.checked;
+        });
+        updateBulkActions();
+    });
+
+    // Gestion des cases individuelles
+    factureCheckboxes.forEach(checkbox => {
+        checkbox.addEventListener('change', updateBulkActions);
+    });
+
+    // Fonction pour marquer comme payées
+    window.markAsPaid = function() {
+        const checkedBoxes = document.querySelectorAll('.facture-checkbox:checked:not(:disabled)');
+        if (checkedBoxes.length === 0) {
+            alert('Veuillez sélectionner au moins une facture.');
+            return;
+        }
+        
+        if (confirm(`Êtes-vous sûr de vouloir marquer ${checkedBoxes.length} facture(s) comme payée(s) ?`)) {
+            bulkForm.submit();
+        }
+    };
+
+    // Fonction pour effacer la sélection
+    window.clearSelection = function() {
+        factureCheckboxes.forEach(checkbox => {
+            checkbox.checked = false;
+        });
+        selectAllCheckbox.checked = false;
+        selectAllCheckbox.indeterminate = false;
+        updateBulkActions();
+    };
+
+    // Initialisation
+    updateBulkActions();
+});
+</script>
+{% endblock %}

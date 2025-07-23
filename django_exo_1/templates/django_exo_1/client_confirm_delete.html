@@ -1,0 +1,80 @@
+{% extends 'django_exo_1/base.html' %}
+{% block title %}Supprimer {{ object.nom }} - {{ block.super }}{% endblock %}
+
+{% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card border-danger">
+      <div class="card-header bg-danger text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Confirmer la suppression
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Attention !</strong> Cette action est irréversible.
+        </div>
+
+        <p>Êtes-vous sûr de vouloir supprimer le client suivant ?</p>
+
+        <!-- Récapitulatif du client -->
+        <div class="card bg-light">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Nom :</strong> {{ object.nom }}<br>
+                <strong>Type :</strong> {{ object.get_type_client_display }}<br>
+                <strong>Email :</strong> {{ object.email }}
+              </div>
+              <div class="col-md-6">
+                <strong>Ville :</strong> {{ object.ville }}<br>
+                <strong>Statut :</strong>
+                {% if object.est_actif %}
+                  <span class="badge bg-success">Actif</span>
+                {% else %}
+                  <span class="badge bg-danger">Inactif</span>
+                {% endif %}<br>
+                <strong>Factures :</strong> {{ object.factures.count }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {% if object.factures.exists %}
+          <div class="alert alert-danger mt-3">
+            <i class="fas fa-exclamation-circle me-2"></i>
+            <strong>Attention :</strong> Ce client a {{ object.factures.count }} facture{{ object.factures.count|pluralize }}.
+            La suppression du client empêchera l'accès à ces factures.
+            
+            <div class="mt-2">
+              <strong>Factures associées :</strong>
+              <ul class="mb-0">
+                {% for facture in object.factures.all|slice:":5" %}
+                  <li>{{ facture.numero }} - {{ facture.montant_ttc }}€ ({{ facture.get_statut_display }})</li>
+                {% endfor %}
+                {% if object.factures.count > 5 %}
+                  <li><em>... et {{ object.factures.count|add:"-5" }} autre{{ object.factures.count|add:"-5"|pluralize }}</em></li>
+                {% endif %}
+              </ul>
+            </div>
+          </div>
+        {% endif %}
+
+        <form method="post" class="mt-4">
+          {% csrf_token %}
+          <div class="d-flex justify-content-between">
+            <a href="{% url 'django_exo_1:client_detail' object.pk %}" class="btn btn-outline-secondary">
+              <i class="fas fa-arrow-left me-1"></i>Annuler
+            </a>
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-trash me-1"></i>Oui, supprimer ce client
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

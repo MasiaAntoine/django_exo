@@ -1,0 +1,59 @@
+{% extends 'django_exo_1/base.html' %} {% block title %}Supprimer Facture {{
+facture.numero }} - {{ block.super }}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-md-8 mx-auto">
+    <div class="card border-danger">
+      <div class="card-header bg-danger text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          Confirmer la suppression
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="alert alert-warning">
+          <i class="fas fa-exclamation-triangle me-2"></i>
+          <strong>Attention !</strong> Cette action est irréversible.
+        </div>
+
+        <p>Êtes-vous sûr de vouloir supprimer la facture suivante ?</p>
+
+        <!-- Récapitulatif de la facture -->
+        <div class="card bg-light">
+          <div class="card-body">
+            <div class="row">
+              <div class="col-md-6">
+                <strong>Numéro :</strong> {{ facture.numero }}<br />
+                <strong>Client :</strong> {{ facture.client.nom }}<br />
+                <strong>Date d'émission :</strong> {{ facture.date_emission|date:"d/m/Y" }}
+              </div>
+              <div class="col-md-6">
+                <strong>Montant TTC :</strong> {{ facture.montant_ttc|floatformat:2 }}€<br />
+                <strong>Statut :</strong>
+                <span class="badge statut-{{ facture.statut }}">
+                  {{ facture.get_statut_display }} </span
+                ><br />
+                <strong>Catégorie :</strong> {{ facture.categorie.nom }}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <form method="post" class="mt-4">
+          {% csrf_token %}
+          <div class="d-flex justify-content-between">
+            <a
+              href="{% url 'django_exo_1:facture_detail' facture.pk %}"
+              class="btn btn-outline-secondary"
+            >
+              <i class="fas fa-arrow-left me-1"></i>Annuler
+            </a>
+            <button type="submit" class="btn btn-danger">
+              <i class="fas fa-trash me-1"></i>Oui, supprimer cette facture
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

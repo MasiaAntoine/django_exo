@@ -1,0 +1,91 @@
+{% extends 'django_exo_1/base.html' %} {% block title %}Liste des Catégories -
+{{ block.super }}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>
+        <i class="fas fa-tags me-2 text-primary"></i>
+        Liste des Catégories
+      </h1>
+      <a
+        href="{% url 'django_exo_1:categorie_create' %}"
+        class="btn btn-primary"
+      >
+        <i class="fas fa-plus me-1"></i>Nouvelle Catégorie
+      </a>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
+    {% if categories %}
+    <div class="row">
+      {% for categorie in categories %}
+      <div class="col-md-4 mb-4">
+        <div class="card h-100">
+          <div
+            class="card-header d-flex justify-content-between align-items-center"
+            style="background-color: {{ categorie.couleur }}; color: white;"
+          >
+            <h6 class="mb-0">{{ categorie.nom }}</h6>
+            <span class="badge bg-light text-dark">
+              {% if categorie.facture_set.count == 0 %}
+                Aucune facture
+              {% elif categorie.facture_set.count == 1 %}
+                1 facture
+              {% else %}
+                {{ categorie.facture_set.count }} factures
+              {% endif %}
+            </span>
+          </div>
+          <div class="card-body">
+            {% if categorie.description %}
+            <p class="card-text">{{ categorie.description }}</p>
+            {% else %}
+            <p class="card-text text-muted">Aucune description</p>
+            {% endif %}
+            <small class="text-muted">
+              Créée le {{ categorie.date_creation|date:"d/m/Y à H:i" }}
+            </small>
+          </div>
+          <div class="card-footer bg-transparent">
+            <div class="btn-group btn-group-sm w-100" role="group">
+              <a
+                href="#"
+                class="btn btn-outline-primary disabled"
+                title="Modifier"
+              >
+                <i class="fas fa-edit"></i> Modifier
+              </a>
+              <a
+                href="#"
+                class="btn btn-outline-danger disabled"
+                title="Supprimer"
+              >
+                <i class="fas fa-trash"></i> Supprimer
+              </a>
+            </div>
+          </div>
+        </div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="text-center py-5">
+      <i class="fas fa-tags fa-4x text-muted mb-3"></i>
+      <h4 class="text-muted">Aucune catégorie trouvée</h4>
+      <p class="text-muted">
+        Commencez par créer votre première catégorie de facture.
+      </p>
+      <a
+        href="{% url 'django_exo_1:categorie_create' %}"
+        class="btn btn-primary"
+      >
+        <i class="fas fa-plus me-1"></i>Créer une catégorie
+      </a>
+    </div>
+    {% endif %}
+  </div>
+</div>
+{% endblock %}

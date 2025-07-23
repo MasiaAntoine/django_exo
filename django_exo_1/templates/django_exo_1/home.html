@@ -1,0 +1,132 @@
+{% extends 'django_exo_1/base.html' %} {% block title %}Accueil - {{ block.super
+}}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <h1 class="mb-4">
+      <i class="fas fa-chart-bar me-2 text-primary"></i>
+      Tableau de bord
+    </h1>
+  </div>
+</div>
+
+<!-- Statistiques -->
+<div class="row mb-4">
+  <div class="col-md-3 mb-3">
+    <div class="card text-white bg-primary">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4 class="card-title">{{ total_factures }}</h4>
+            <p class="card-text">Total Factures</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-file-invoice fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-3">
+    <div class="card text-white bg-info">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4 class="card-title">{{ total_clients }}</h4>
+            <p class="card-text">Total Clients</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-users fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-3">
+    <div class="card text-white bg-success">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4 class="card-title">{{ factures_payees }}</h4>
+            <p class="card-text">Factures Payées</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-check-circle fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-3 mb-3">
+    <div class="card text-white bg-warning">
+      <div class="card-body">
+        <div class="d-flex justify-content-between">
+          <div>
+            <h4 class="card-title">{{ ca_total|floatformat:2 }}€</h4>
+            <p class="card-text">CA Réalisé</p>
+          </div>
+          <div class="align-self-center">
+            <i class="fas fa-euro-sign fa-2x"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- Actions rapides -->
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-bolt me-2"></i>
+          Actions rapides
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-3 mb-3">
+            <a
+              href="{% url 'django_exo_1:facture_create' %}"
+              class="btn btn-primary btn-lg w-100"
+            >
+              <i class="fas fa-plus me-2"></i>
+              Nouvelle Facture
+            </a>
+          </div>
+          <div class="col-md-3 mb-3">
+            <a
+              href="{% url 'django_exo_1:client_create' %}"
+              class="btn btn-success btn-lg w-100"
+            >
+              <i class="fas fa-user-plus me-2"></i>
+              Nouveau Client
+            </a>
+          </div>
+          <div class="col-md-3 mb-3">
+            <a
+              href="{% url 'django_exo_1:client_list' %}"
+              class="btn btn-outline-info btn-lg w-100"
+            >
+              <i class="fas fa-users me-2"></i>
+              Voir les clients
+            </a>
+          </div>
+          <div class="col-md-3 mb-3">
+            <a
+              href="{% url 'django_exo_1:facture_list' %}"
+              class="btn btn-outline-primary btn-lg w-100"
+            >
+              <i class="fas fa-list me-2"></i>
+              Voir les factures
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

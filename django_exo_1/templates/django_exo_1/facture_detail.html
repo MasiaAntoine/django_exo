@@ -1,0 +1,172 @@
+{% extends 'django_exo_1/base.html' %} {% block title %}Détail Facture {{
+facture.numero }} - {{ block.super }}{% endblock %} {% block content %}
+<div class="row">
+  <div class="col-12">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+      <h1>
+        <i class="fas fa-file-invoice me-2 text-primary"></i>
+        Facture {{ facture.numero }}
+      </h1>
+      <div>
+        <a
+          href="{% url 'django_exo_1:facture_update' facture.pk %}"
+          class="btn btn-primary"
+        >
+          <i class="fas fa-edit me-1"></i>Modifier
+        </a>
+        <a
+          href="{% url 'django_exo_1:facture_list' %}"
+          class="btn btn-outline-secondary"
+        >
+          <i class="fas fa-arrow-left me-1"></i>Retour à la liste
+        </a>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-lg-8">
+    <div class="card">
+      <div class="card-header bg-primary text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-info-circle me-2"></i>
+          Informations de la facture
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <strong>Numéro :</strong><br />
+            {{ facture.numero }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Statut :</strong><br />
+            <span class="badge statut-{{ facture.statut }}">
+              {{ facture.get_statut_display }}
+            </span>
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Date d'émission :</strong><br />
+            {{ facture.date_emission|date:"d/m/Y" }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Date d'échéance :</strong><br />
+            {{ facture.date_echeance|date:"d/m/Y" }}
+          </div>
+          <div class="col-12 mb-3">
+            <strong>Catégorie :</strong><br />
+            <span
+              class="badge"
+              style="background-color: {{ facture.categorie.couleur }}"
+            >
+              {{ facture.categorie.nom }}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informations client -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-user me-2"></i>
+          Informations client
+        </h5>
+      </div>
+      <div class="card-body">
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <strong>Nom :</strong><br />
+            {{ facture.client.nom }}
+          </div>
+          <div class="col-md-6 mb-3">
+            <strong>Email :</strong><br />
+            <a href="mailto:{{ facture.client.email }}"
+              >{{ facture.client.email }}</a
+            >
+          </div>
+          <div class="col-12 mb-3">
+            <strong>Adresse :</strong><br />
+            {{ facture.client.adresse_complete|linebreaks }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Description -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-file-text me-2"></i>
+          Description
+        </h5>
+      </div>
+      <div class="card-body">
+        <p>{{ facture.description|linebreaks }}</p>
+
+        {% if facture.notes %}
+        <hr />
+        <h6>Notes internes :</h6>
+        <p class="text-muted">{{ facture.notes|linebreaks }}</p>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+  <!-- Récapitulatif financier -->
+  <div class="col-lg-4">
+    <div class="card">
+      <div class="card-header bg-success text-white">
+        <h5 class="card-title mb-0">
+          <i class="fas fa-euro-sign me-2"></i>
+          Récapitulatif financier
+        </h5>
+      </div>
+      <div class="card-body">
+        <table class="table table-borderless">
+          <tr>
+            <td><strong>Montant HT :</strong></td>
+            <td class="text-end">{{ facture.montant_ht|floatformat:2 }}€</td>
+          </tr>
+          <tr>
+            <td><strong>Taux TVA :</strong></td>
+            <td class="text-end">{{ facture.taux_tva|floatformat:2 }}%</td>
+          </tr>
+          <tr>
+            <td><strong>Montant TVA :</strong></td>
+            <td class="text-end">{{ facture.montant_tva|floatformat:2 }}€</td>
+          </tr>
+          <tr class="border-top">
+            <td><strong>Montant TTC :</strong></td>
+            <td class="text-end">
+              <strong>{{ facture.montant_ttc|floatformat:2 }}€</strong>
+            </td>
+          </tr>
+        </table>
+      </div>
+    </div>
+
+    <!-- Métadonnées -->
+    <div class="card mt-4">
+      <div class="card-header">
+        <h6 class="card-title mb-0">
+          <i class="fas fa-clock me-2"></i>
+          Métadonnées
+        </h6>
+      </div>
+      <div class="card-body">
+        <p class="small mb-1">
+          <strong>Créée le :</strong><br />
+          {{ facture.date_creation|date:"d/m/Y à H:i" }}
+        </p>
+        <p class="small mb-0">
+          <strong>Modifiée le :</strong><br />
+          {{ facture.date_modification|date:"d/m/Y à H:i" }}
+        </p>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}

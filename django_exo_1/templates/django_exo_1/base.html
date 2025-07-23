@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="fr">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>{% block title %}Gestion des Factures{% endblock %}</title>
+    <!-- Bootstrap CSS -->
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <!-- Font Awesome -->
+    <link
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+      rel="stylesheet"
+    />
+
+    <style>
+      .navbar-brand {
+        font-weight: bold;
+      }
+      .card {
+        box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+        border: 1px solid rgba(0, 0, 0, 0.125);
+      }
+      .badge-statut {
+        font-size: 0.8em;
+      }
+      .statut-brouillon {
+        background-color: #6c757d;
+      }
+      .statut-envoyee {
+        background-color: #fd7e14;
+      }
+      .statut-payee {
+        background-color: #198754;
+      }
+      .statut-annulee {
+        background-color: #dc3545;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
+      <div class="container">
+        <a class="navbar-brand" href="{% url 'django_exo_1:home' %}">
+          <i class="fas fa-file-invoice-dollar me-2"></i>
+          Gestion Factures
+        </a>
+
+        <button
+          class="navbar-toggler"
+          type="button"
+          data-bs-toggle="collapse"
+          data-bs-target="#navbarNav"
+        >
+          <span class="navbar-toggler-icon"></span>
+        </button>
+
+        <div class="collapse navbar-collapse" id="navbarNav">
+          <ul class="navbar-nav me-auto">
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'django_exo_1:home' %}">
+                <i class="fas fa-home me-1"></i>Accueil
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'django_exo_1:dashboard' %}">
+                <i class="fas fa-chart-line me-1"></i>Dashboard
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'django_exo_1:client_list' %}">
+                <i class="fas fa-users me-1"></i>Clients
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="{% url 'django_exo_1:facture_list' %}">
+                <i class="fas fa-file-invoice me-1"></i>Factures
+              </a>
+            </li>
+            <li class="nav-item">
+              <a
+                class="nav-link"
+                href="{% url 'django_exo_1:categorie_list' %}"
+              >
+                <i class="fas fa-tags me-1"></i>Catégories
+              </a>
+            </li>
+          </ul>
+
+          <ul class="navbar-nav">
+            <li class="nav-item dropdown">
+              <a
+                class="nav-link dropdown-toggle"
+                href="#"
+                role="button"
+                data-bs-toggle="dropdown"
+              >
+                <i class="fas fa-plus me-1"></i>Nouveau
+              </a>
+              <ul class="dropdown-menu">
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'django_exo_1:client_create' %}"
+                  >
+                    <i class="fas fa-user-plus me-2"></i>Nouveau Client
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'django_exo_1:facture_create' %}"
+                  >
+                    <i class="fas fa-file-invoice me-2"></i>Nouvelle Facture
+                  </a>
+                </li>
+                <li>
+                  <a
+                    class="dropdown-item"
+                    href="{% url 'django_exo_1:categorie_create' %}"
+                  >
+                    <i class="fas fa-tag me-2"></i>Nouvelle Catégorie
+                  </a>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Messages -->
+    {% if messages %}
+    <div class="container mt-3">
+      {% for message in messages %}
+      <div
+        class="alert alert-{{ message.tags }} alert-dismissible fade show"
+        role="alert"
+      >
+        {% if message.tags == 'error' %}
+        <i class="fas fa-exclamation-triangle me-2"></i>
+        {% elif message.tags == 'success' %}
+        <i class="fas fa-check-circle me-2"></i>
+        {% elif message.tags == 'warning' %}
+        <i class="fas fa-exclamation-circle me-2"></i>
+        {% else %}
+        <i class="fas fa-info-circle me-2"></i>
+        {% endif %} {{ message }}
+        <button
+          type="button"
+          class="btn-close"
+          data-bs-dismiss="alert"
+        ></button>
+      </div>
+      {% endfor %}
+    </div>
+    {% endif %}
+
+    <!-- Contenu principal -->
+    <main class="container mt-4">{% block content %} {% endblock %}</main>
+
+    <!-- Footer -->
+    <footer class="bg-light text-center text-lg-start mt-5">
+      <div class="text-center p-3">
+        <small class="text-muted">
+          © 2024 Gestion des Factures - Développé avec Django
+        </small>
+      </div>
+    </footer>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    {% block extra_js %} {% endblock %}
+  </body>
+</html>
